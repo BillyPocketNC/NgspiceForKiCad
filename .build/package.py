@@ -69,39 +69,52 @@ class packageAddon():
     def kicadPull(self):
         pass
     def createArchive(self,outFileName):
+        print("creating archive...")
         #update metadata
 
         #create and submit new git tag for the release.
         # check if folders and files actually exist.
 
-        with open(outFileName,"rb") as f:
-            h = hashlib.file_digest(f,"sha256")
-        self.metadata["versions"][0].update({"download_sha256":h.hexdigest()})
-        f.close()
 
         zf = zipfile.ZipFile(outFileName, "w",compression=zipfile.ZIP_DEFLATED)
         for file in self.files:
             zf.write(file)
+        last = 0
         for folder in self.folders:
+            print("\r\nProcessing: {}".format(folder))
             for dirname, subdirs, files in os.walk(folder):
                 zf.write(dirname)
+                print("\r"+" "*last,end="")
+                print("\r{}\r".format(dirname),end="")
+                last = len(dirname)
                 for filename in files:
                     zf.write(os.path.join(dirname, filename),compress_type=zipfile.ZIP_DEFLATED)
-        print([zinfo.compress_size for zinfo in zf.filelist])
+        print()
         zf.close()
         zf = zipfile.ZipFile(outFileName, "r",compression=zipfile.ZIP_DEFLATED)
-        size = sum([zinfo.file_size for zinfo in zf.filelist])#zip archive size
-        csize = sum([zinfo.compress_size for zinfo in zf.filelist])#zip compressed size
+        #size = sum([zinfo.file_size for zinfo in zf.filelist])#zip archive size
+        #csize = sum([zinfo.compress_size for zinfo in zf.filelist])#zip compressed size
         zf.extractall("archive")
         zipSize = os.stat(outFileName).st_size
         extract_size = 0
+        last =0
+        print("finding extracted Size: ")
         for path, dirs, files in os.walk("archive"):
+            print("\r"+" "*last,end="")
+            print("\rwalking: {}".format(path),end="")
+            last = len("walking: {}".format(path))
             for f in files:
                 fp = os.path.join(path, f)
                 extract_size += os.path.getsize(fp)
- 
+        print()
         #estat = os.path.getsize("archive")
-        print("size/compressed: {} , {}\r\nfolder: {}\r\nzip: {}".format(size, csize,extract_size, zipSize))
+        print("folder: {}\r\nzip   : {}\r\nsaved : {}".format(extract_size, zipSize,extract_size-zipSize))
+        
+        with open(outFileName,"rb") as f:
+            h = hashlib.file_digest(f,"sha256")
+        self.metadata["versions"][0].update({"download_sha256":h.hexdigest()})
+        f.close()
+        
         self.metadata["versions"][0].update({
             "download_size": zipSize,
             "install_size": extract_size
