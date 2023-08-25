@@ -1,0 +1,32 @@
+{
+    "$schema": "https://go.kicad.org/pcm/schemas/v1",
+    "name": "Ngspice for KiCad",
+    "description": "A set of symbols for easier Ngspice Simulation. ",
+    "description_full": "Experimental Plugin filled with Ngspice Simulations",
+    "identifier": "com.github.BillyPocketNC.NgspiceForKiCad",
+    "type": "library",
+    "author": {
+        "name": "Billy Bogardus",
+        "contact": {
+            "web": "https://github.com/BillyPocketNC/NgspiceForKiCad"
+        }
+    },
+    "maintainer": {
+        "name": "KiCad User",
+        "contact": {
+            "web": "https://github.com/BillyPocketNC/NgspiceForKiCad"
+        }
+    },
+    "license": "CC0-1.0",
+    "resources": {
+        "homepage": "https://github.com/BillyPocketNC/NgspiceForKiCad"
+    },
+    "versions": [
+        {
+            "version": "0.0.0",
+            "status": "testing",
+            "kicad_version": "7",
+            "download_url": "https://github.com/Sajitha-Aldeniya/KiCAD-Schematic-Blocks-Plugin/releases/download/0.0.0/NgspiceForKiCad_0.0.0.zip"
+        }
+    ]
+}
