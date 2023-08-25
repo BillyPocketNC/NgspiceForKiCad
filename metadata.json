@@ -26,7 +26,7 @@
             "version": "0.0.0",
             "status": "testing",
             "kicad_version": "7",
-            "download_url": "https://github.com/Sajitha-Aldeniya/KiCAD-Schematic-Blocks-Plugin/releases/download/0.0.0/NgspiceForKiCad_0.0.0.zip"
+            "download_url": "https://github.com/BillyPocketNC/NgspiceForKiCad/releases/download/0.0.0/NgspiceForKiCad_0.0.0.zip"
         }
     ]
 }
