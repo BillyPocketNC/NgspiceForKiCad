@@ -1,0 +1,4 @@
+__python__
+*.pyc
+archive
+*.zip
