@@ -23,11 +23,16 @@ STATUS_DEVELOPMENT = "development"
 STATUS_DEPRECATED = "deprecated"
 
 class packageAddon():
-    def __init__(self, currentdir="./", ThirdPartyDirectory="C:/Users/billy/Documents/KICAD/7.0/3rdparty/",ThirdPartyVariable="$\{KICAD7_3RD_PARTY\}"):
+    def __init__(self, 
+                 currentdir="./", 
+                 ThirdPartyDirectory="C:/Users/billy/Documents/KICAD/7.0/3rdparty/",
+                 ThirdPartyVariable="$\{KICAD7_3RD_PARTY\}"):
         self.THIRD_PARTY = ThirdPartyDirectory
         self.VAR_THIRD_PARTY = ThirdPartyVariable
         self.checkPackageFolders(currentdir)
         self.importPackageInfo()
+        self.checkKiCadFolders()
+
 
     def __del__(self):
         print("package object destroyed!")
@@ -59,14 +64,52 @@ class packageAddon():
         subprocess.run("git tag -a {} -m \"{}\"".format(rev,message))
         subprocess.run("git push --tag")
     def copyFolder(self,s:str,d:str):
+        print("Removing {} directory".format(d))
         shutil.rmtree(d)
         #TODO check if this delets files pointed to by a symlink
-        shutil.copy(s,d,follow_symlinks=False)
+        print("Coppying {} to {}".format(s,d))
+        shutil.copytree(
+            os.path.join(s),
+            os.path.join(d),symlinks=True)
     def gitPush(self):
         subprocess.run("git push")
+
+    def checkKiCadFolders(self):
+        """
+        Generate and check if the KiCad Folders exist 
+        existing folders are stored in the self.KiCadFolders Member.
+        returns the discarded paths.
+        """
+        self.kiCadFolders = ["{}{}/{}/".format(self.THIRD_PARTY,x, self.metadata["identifier"].replace(".","_")) for x in PACKAGE_FOLDERS]
+        keep = list()
+        discard = list()
+        for x in self.kiCadFolders:
+            if(os.path.exists(x)):
+                keep.append(x)
+            else:
+                discard.append(x)
+        self.kiCadFolders = keep
+        return discard
+
     def kicadPush(self):
+        """push the current repository to KiCad"""
+        d = list()
+        for folder in self.folders:
+            new = "{}{}/{}/".format(self.THIRD_PARTY,folder, self.metadata["identifier"].replace(".","_"))
+            d.append((
+                folder,
+                new
+            ))
+            print("copying from {} to {}".format(folder,new))
+            self.copyFolder(folder,new)
+
         pass
     def kicadPull(self):
+        """pull the current kicad folders to this machine"""
+        for folder in self.kiCadFolders:
+            dest = folder.split("/")[-3]
+            self.copyFolder(folder,dest)
+
         pass
     def createArchive(self,outFileName):
         print("creating archive...")
@@ -128,6 +171,8 @@ class packageAddon():
 if(__name__=="__main__"):
     test = packageAddon()
     test.createArchive("archive.zip")
+    test.kicadPush()
+    test.kicadPull()
 
     del test
 
